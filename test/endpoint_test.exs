@@ -27,10 +27,21 @@ defmodule HildrRoller.EndpointTest do
   end
 
   test "it returns a dice result" do
-    conn = conn(:post, "/roll")
+    conn = conn(:post, "/roll", %{data: 'd1'})
 
     conn = HildrRoller.Endpoint.call(conn, @opts)
 
+    result_as_json = %{result: 1} |> Poison.encode!()
+
     assert conn.status == 200
+    assert conn.resp_body == result_as_json
+  end
+
+  test "it returns an error on invalid request" do
+    conn = conn(:post, "/roll", %{data: 'd1d2d3'})
+
+    conn = HildrRoller.Endpoint.call(conn, @opts)
+
+    assert conn.status == 400
   end
 end
